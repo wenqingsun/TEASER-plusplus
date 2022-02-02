@@ -76,13 +76,13 @@ Number of outliers: 1700
 Time taken (s): 0.786677
 ```
 ### Minimal Python 3 example
-Run the following script to show a minimal Python 3 example (needs Anaconda installed):
+Run the following script to show a minimal Python 3 example (needs Docker installed):
 ```shell script
-sudo apt install cmake libeigen3-dev libboost-all-dev
-conda create -n teaser_test python=3.6 numpy
-conda activate teaser_test
-conda install -c open3d-admin open3d=0.9.0.0
-git clone https://github.com/MIT-SPARK/TEASER-plusplus.git
+apt-get update
+apt install cmake libeigen3-dev libboost-all-dev
+pip install open3d==0.9.0.0
+apt-get install ffmpeg libsm6 libxext6  -y
+
 cd TEASER-plusplus && mkdir build && cd build
 cmake -DTEASERPP_PYTHON_VERSION=3.6 .. && make teaserpp_python
 cd python && pip install .
