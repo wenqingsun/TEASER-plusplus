@@ -5,7 +5,6 @@ import open3d as o3d
 import teaserpp_python
 
 NOISE_BOUND = 0.05
-N_OUTLIERS = 1700
 OUTLIER_TRANSLATION_LB = 5
 OUTLIER_TRANSLATION_UB = 10
 
@@ -23,29 +22,16 @@ if __name__ == "__main__":
     print("==================================================")
 
     # Load bunny ply file
-    src_cloud = o3d.io.read_point_cloud("../example_data/bun_zipper_res3.ply")
+    src_cloud = o3d.io.read_point_cloud("/home/vince/Experiments/idepth/results_3d/2019-01-25_17-45-17_part0001/left.ply")
+    dst_cloud = o3d.io.read_point_cloud("/home/vince/Experiments/idepth/results_3d_reverse/2019-01-25_17-45-17_part0001/right.ply")
     src = np.transpose(np.asarray(src_cloud.points))
-    N = src.shape[1]
-
-    # Apply arbitrary scale, translation and rotation
-    T = np.array(
-        [[9.96926560e-01, 6.68735757e-02, -4.06664421e-02, -1.15576939e-01],
-         [-6.61289946e-02, 9.97617877e-01, 1.94008687e-02, -3.87705398e-02],
-         [4.18675510e-02, -1.66517807e-02, 9.98977765e-01, 1.14874890e-01],
-         [0, 0, 0, 1]])
-
-    dst_cloud = copy.deepcopy(src_cloud)
-    dst_cloud.transform(T)
     dst = np.transpose(np.asarray(dst_cloud.points))
+    NOISE_BOUND = max(np.std(src[2])*2, np.std(dst[2])*2)
+    print("NOISE_BOUND: ")
+    print(NOISE_BOUND)
 
-    # Add some noise
-    dst += (np.random.rand(3, N) - 0.5) * 2 * NOISE_BOUND
-
-    # Add some outliers
-    outlier_indices = np.random.randint(N_OUTLIERS, size=N_OUTLIERS)
-    for i in range(outlier_indices.size):
-        shift = OUTLIER_TRANSLATION_LB + np.random.rand(3, 1) * (OUTLIER_TRANSLATION_UB - OUTLIER_TRANSLATION_LB)
-        dst[:, outlier_indices[i]] += shift.squeeze()
+    N_src = src.shape[1]
+    N_dst = dst.shape[1]
 
     # Populating the parameters
     solver_params = teaserpp_python.RobustRegistrationSolver.Params()
@@ -68,21 +54,15 @@ if __name__ == "__main__":
     print("          TEASER++ Results           ")
     print("=====================================")
 
-    print("Expected rotation: ")
-    print(T[:3, :3])
+
     print("Estimated rotation: ")
     print(solution.rotation)
-    print("Error (rad): ")
-    print(get_angular_error(T[:3,:3], solution.rotation))
 
-    print("Expected translation: ")
-    print(T[:3, 3])
     print("Estimated translation: ")
     print(solution.translation)
-    print("Error (m): ")
-    print(np.linalg.norm(T[:3, 3] - solution.translation))
 
-    print("Number of correspondences: ", N)
-    print("Number of outliers: ", N_OUTLIERS)
+
+    print("Number of src correspondences: ", N_src)
+    print("Number of dst correspondences: ", N_dst)
     print("Time taken (s): ", end - start)
 
