@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
     # Load bunny ply file
     src_cloud = o3d.io.read_point_cloud("/home/vince/Experiments/idepth/results_3d/2019-01-25_17-45-17_part0001/left.ply")
-    dst_cloud = o3d.io.read_point_cloud("/home/vince/Experiments/idepth/results_3d_reverse/2019-01-25_17-45-17_part0001/right.ply")
+    dst_cloud = o3d.io.read_point_cloud("/home/vince/Experiments/idepth/results_3d/2019-01-25_17-45-17_part0001/left2.ply")
     src = np.transpose(np.asarray(src_cloud.points))
     dst = np.transpose(np.asarray(dst_cloud.points))
     NOISE_BOUND = max(np.std(src[2])*2, np.std(dst[2])*2)
